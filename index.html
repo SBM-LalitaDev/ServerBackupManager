@@ -1,0 +1,1367 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Server Backup Manager | Respaldos seguros</title>
+
+    <meta name="description" content="Server Backup Manager: herramienta de escritorio para respaldar y restaurar variables de entorno y Secret Files de tus cuentas Render mediante backups cifrados.">
+
+    <meta name="theme-color" content="#0b1220">
+
+    <style>
+        :root {
+            --bg: #0b1220;
+            --bg-soft: #101b2e;
+            --card: #142238;
+            --card-hover: #192c45;
+            --primary: #38bdf8;
+            --primary-dark: #0284c7;
+            --green: #34d399;
+            --text: #e5edf7;
+            --muted: #94a8c0;
+            --border: rgba(148, 168, 192, .15);
+            --radius: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 90px;
+        }
+
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .container {
+            width: min(1120px, 90%);
+            margin: auto;
+        }
+
+        /* HEADER */
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(11, 18, 32, .94);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .navbar {
+            min-height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            font-size: 19px;
+            font-weight: 750;
+            letter-spacing: -.5px;
+        }
+
+        .brand-icon {
+            width: 39px;
+            height: 39px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, #0ea5e9, #2563eb);
+            border-radius: 11px;
+            font-size: 21px;
+        }
+
+        .brand span:last-child {
+            color: var(--primary);
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 27px;
+        }
+
+        nav a {
+            color: var(--muted);
+            font-size: 14px;
+            transition: .2s;
+        }
+
+        nav a:hover {
+            color: var(--primary);
+        }
+
+        .nav-download {
+            background: var(--primary);
+            color: #071421;
+            padding: 9px 17px;
+            border-radius: 9px;
+            font-weight: 700;
+        }
+
+        .nav-download:hover {
+            color: #071421;
+            background: #7dd3fc;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: 0;
+            color: var(--text);
+            font-size: 27px;
+            cursor: pointer;
+        }
+
+        /* HERO */
+
+        .hero {
+            position: relative;
+            overflow: hidden;
+            padding: 105px 0 100px;
+            background:
+                radial-gradient(ellipse at 80% 25%, rgba(14,165,233,.15), transparent 42%),
+                radial-gradient(ellipse at 10% 90%, rgba(37,99,235,.12), transparent 40%);
+        }
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1.2fr .8fr;
+            align-items: center;
+            gap: 65px;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 13px;
+            border: 1px solid rgba(56,189,248,.3);
+            border-radius: 50px;
+            color: var(--primary);
+            background: rgba(56,189,248,.07);
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 23px;
+        }
+
+        .eyebrow-dot {
+            width: 7px;
+            height: 7px;
+            background: var(--green);
+            border-radius: 50%;
+        }
+
+        h1 {
+            font-size: clamp(38px, 5vw, 59px);
+            line-height: 1.12;
+            letter-spacing: -2px;
+            margin-bottom: 22px;
+        }
+
+        h1 span {
+            color: var(--primary);
+        }
+
+        .hero-description {
+            color: var(--muted);
+            font-size: 17px;
+            max-width: 570px;
+            margin-bottom: 30px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 13px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            padding: 13px 21px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 14px;
+            transition: .2s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #071421;
+        }
+
+        .btn-primary:hover {
+            background: #7dd3fc;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            border: 1px solid var(--border);
+            color: var(--text);
+            background: rgba(255,255,255,.03);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .hero-visual {
+            display: flex;
+            justify-content: center;
+        }
+
+        .server-illustration {
+            width: 100%;
+            max-width: 365px;
+            padding: 28px;
+            background: linear-gradient(145deg, #172b43, #0d192b);
+            border: 1px solid rgba(56,189,248,.2);
+            border-radius: 23px;
+            box-shadow: 0 25px 80px rgba(0,0,0,.3);
+        }
+
+        .server-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--muted);
+            font-size: 12px;
+            margin-bottom: 23px;
+        }
+
+        .server-status {
+            color: var(--green);
+        }
+
+        .server-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 17px;
+            background: rgba(255,255,255,.045);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-top: 12px;
+        }
+
+        .server-icon {
+            width: 43px;
+            height: 43px;
+            display: grid;
+            place-items: center;
+            background: rgba(56,189,248,.12);
+            border-radius: 10px;
+            font-size: 21px;
+        }
+
+        .server-item strong {
+            display: block;
+            font-size: 14px;
+        }
+
+        .server-item small {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .secure-label {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            color: var(--green);
+            font-size: 12px;
+            margin-top: 23px;
+        }
+
+        /* GENERAL SECTIONS */
+
+        section {
+            padding: 85px 0;
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 670px;
+            margin: 0 auto 48px;
+        }
+
+        .section-tag {
+            color: var(--primary);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 750;
+        }
+
+        .section-header h2 {
+            font-size: clamp(27px, 4vw, 37px);
+            letter-spacing: -.8px;
+            margin: 12px 0;
+        }
+
+        .section-header p {
+            color: var(--muted);
+            font-size: 15px;
+        }
+
+        /* FEATURES */
+
+        .features {
+            background: var(--bg-soft);
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .feature-card {
+            padding: 27px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            transition: .25s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            background: var(--card-hover);
+            border-color: rgba(56,189,248,.4);
+        }
+
+        .feature-icon {
+            width: 49px;
+            height: 49px;
+            display: grid;
+            place-items: center;
+            border-radius: 13px;
+            background: rgba(56,189,248,.11);
+            font-size: 23px;
+            margin-bottom: 19px;
+        }
+
+        .feature-card h3 {
+            font-size: 17px;
+            margin-bottom: 10px;
+        }
+
+        .feature-card p {
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        /* HOW IT WORKS */
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .step {
+            position: relative;
+            padding: 24px 20px;
+            border-left: 2px solid rgba(56,189,248,.35);
+        }
+
+        .step-number {
+            width: 35px;
+            height: 35px;
+            display: grid;
+            place-items: center;
+            background: rgba(56,189,248,.14);
+            color: var(--primary);
+            font-weight: 800;
+            border-radius: 10px;
+            margin-bottom: 17px;
+        }
+
+        .step h3 {
+            font-size: 16px;
+            margin-bottom: 9px;
+        }
+
+        .step p {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        /* SECURITY */
+
+        .security {
+            background: var(--bg-soft);
+        }
+
+        .security-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+        }
+
+        .security-content h2 {
+            font-size: 32px;
+            line-height: 1.25;
+            margin: 13px 0 20px;
+        }
+
+        .security-content p {
+            color: var(--muted);
+            font-size: 15px;
+            margin-bottom: 18px;
+        }
+
+        .security-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .security-item {
+            display: flex;
+            gap: 13px;
+            padding: 16px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .check {
+            color: var(--green);
+            font-size: 19px;
+        }
+
+        .security-item strong {
+            display: block;
+            font-size: 14px;
+        }
+
+        .security-item small {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        /* DOWNLOAD */
+
+        .download-section {
+            background:
+                radial-gradient(ellipse at center, rgba(14,165,233,.12), transparent 65%);
+        }
+
+        .download-card {
+            max-width: 850px;
+            margin: auto;
+            padding: 45px;
+            text-align: center;
+            background: linear-gradient(145deg, #172c46, #101d31);
+            border: 1px solid rgba(56,189,248,.27);
+            border-radius: 22px;
+        }
+
+        .download-icon {
+            font-size: 44px;
+            margin-bottom: 15px;
+        }
+
+        .download-card h2 {
+            font-size: 30px;
+            margin-bottom: 12px;
+        }
+
+        .download-card > p {
+            color: var(--muted);
+            margin-bottom: 25px;
+        }
+
+        .download-meta {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 24px 0;
+        }
+
+        .meta-item {
+            padding: 9px 15px;
+            background: rgba(255,255,255,.05);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .meta-item strong {
+            color: var(--text);
+        }
+
+        .download-note {
+            display: block;
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 18px;
+        }
+
+        /* REQUIREMENTS */
+
+        .requirements {
+            margin-top: 30px;
+            text-align: left;
+            padding: 22px;
+            background: rgba(0,0,0,.13);
+            border-radius: 12px;
+        }
+
+        .requirements h3 {
+            font-size: 15px;
+            margin-bottom: 12px;
+        }
+
+        .requirements ul {
+            padding-left: 20px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        /* CHANGELOG */
+
+        .changelog {
+            background: var(--bg-soft);
+        }
+
+        .timeline {
+            max-width: 760px;
+            margin: auto;
+            position: relative;
+        }
+
+        .timeline::before {
+            content: "";
+            position: absolute;
+            left: 9px;
+            top: 8px;
+            bottom: 8px;
+            width: 2px;
+            background: rgba(56,189,248,.2);
+        }
+
+        .release {
+            position: relative;
+            padding-left: 39px;
+            margin-bottom: 35px;
+        }
+
+        .release::before {
+            content: "";
+            position: absolute;
+            left: 2px;
+            top: 7px;
+            width: 16px;
+            height: 16px;
+            background: var(--primary);
+            border: 4px solid var(--bg-soft);
+            border-radius: 50%;
+            box-shadow: 0 0 0 2px rgba(56,189,248,.25);
+        }
+
+        .release-date {
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .release h3 {
+            font-size: 21px;
+            margin: 5px 0 12px;
+        }
+
+        .release ul {
+            padding-left: 19px;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .version-badge {
+            display: inline-block;
+            margin-left: 8px;
+            padding: 3px 9px;
+            background: rgba(52,211,153,.12);
+            color: var(--green);
+            border-radius: 6px;
+            font-size: 11px;
+            vertical-align: middle;
+        }
+
+        .future {
+            padding: 25px;
+            border: 1px dashed rgba(56,189,248,.3);
+            border-radius: 13px;
+            background: rgba(56,189,248,.035);
+        }
+
+        .future h3 {
+            font-size: 17px;
+            margin-bottom: 10px;
+        }
+
+        .future p {
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        /* LIMITATIONS */
+
+        .limitations {
+            padding: 55px 0;
+        }
+
+        .limitations-box {
+            padding: 25px;
+            border: 1px solid rgba(251,191,36,.25);
+            background: rgba(251,191,36,.045);
+            border-radius: 13px;
+        }
+
+        .limitations-box h3 {
+            color: #fbbf24;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .limitations-box p {
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        /* FOOTER */
+
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 32px 0;
+            background: #080e19;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .footer-brand {
+            font-weight: 750;
+            font-size: 16px;
+        }
+
+        .footer-brand span {
+            color: var(--primary);
+        }
+
+        .footer-content p {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 850px) {
+            .hero-content,
+            .security-content {
+                grid-template-columns: 1fr;
+            }
+
+            .hero {
+                padding: 75px 0;
+            }
+
+            .hero-visual {
+                margin-top: 15px;
+            }
+
+            .feature-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .steps-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 650px) {
+            .navbar {
+                min-height: 65px;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            nav {
+                display: none;
+                position: absolute;
+                top: 65px;
+                left: 0;
+                right: 0;
+                padding: 20px 5%;
+                background: #101b2e;
+                border-bottom: 1px solid var(--border);
+                flex-direction: column;
+                align-items: stretch;
+                gap: 16px;
+            }
+
+            nav.active {
+                display: flex;
+            }
+
+            nav a {
+                padding: 5px 0;
+            }
+
+            .nav-download {
+                text-align: center;
+            }
+
+            .feature-grid,
+            .steps-grid {
+                grid-template-columns: 1fr;
+            }
+
+            section {
+                padding: 65px 0;
+            }
+
+            .hero {
+                padding: 65px 0;
+            }
+
+            .hero-description {
+                font-size: 15px;
+            }
+
+            .download-card {
+                padding: 28px 19px;
+            }
+
+            .download-card h2 {
+                font-size: 25px;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .footer-links {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="container navbar">
+
+        <a href="#inicio" class="brand">
+            <span class="brand-icon">🛡️</span>
+            <span>Server <span>Backup Manager</span></span>
+        </a>
+
+        <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">
+            ☰
+        </button>
+
+        <nav id="navigation">
+            <a href="#inicio">Inicio</a>
+            <a href="#caracteristicas">Características</a>
+            <a href="#seguridad">Seguridad</a>
+            <a href="#descarga">Descarga</a>
+            <a href="#actualizaciones">Actualizaciones</a>
+            <a href="#descarga" class="nav-download">Descargar</a>
+        </nav>
+
+    </div>
+</header>
+
+<main>
+
+    <!-- HERO -->
+
+    <section class="hero" id="inicio">
+        <div class="container hero-content">
+
+            <div>
+                <div class="eyebrow">
+                    <span class="eyebrow-dot"></span>
+                    Herramienta de escritorio para Windows
+                </div>
+
+                <h1>
+                    Tus configuraciones,
+                    <span>siempre protegidas.</span>
+                </h1>
+
+                <p class="hero-description">
+                    Respaldá y recuperá las variables de entorno y
+                    Secret Files de tus cuentas Render desde una
+                    única aplicación. Simple, segura y fácil de usar.
+                </p>
+
+                <div class="hero-buttons">
+                    <a href="#descarga" class="btn btn-primary">
+                        ⬇ Descargar software
+                    </a>
+
+                    <a href="#caracteristicas" class="btn btn-secondary">
+                        Conocer funcionalidades
+                    </a>
+                </div>
+            </div>
+
+            <div class="hero-visual">
+                <div class="server-illustration">
+
+                    <div class="server-top">
+                        <strong>SERVER BACKUP MANAGER</strong>
+                        <span class="server-status">● ACTIVO</span>
+                    </div>
+
+                    <div class="server-item">
+                        <div class="server-icon">☁️</div>
+                        <div>
+                            <strong>Cuentas Render</strong>
+                            <small>Gestión de múltiples cuentas</small>
+                        </div>
+                    </div>
+
+                    <div class="server-item">
+                        <div class="server-icon">📦</div>
+                        <div>
+                            <strong>Backups cifrados</strong>
+                            <small>Respaldo de configuraciones</small>
+                        </div>
+                    </div>
+
+                    <div class="server-item">
+                        <div class="server-icon">🔄</div>
+                        <div>
+                            <strong>Restauración</strong>
+                            <small>Recuperación de archivos</small>
+                        </div>
+                    </div>
+
+                    <div class="secure-label">
+                        🔒 Protección AES-256-GCM
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- CARACTERISTICAS -->
+
+    <section class="features" id="caracteristicas">
+
+        <div class="container">
+
+            <div class="section-header">
+                <span class="section-tag">Funcionalidades</span>
+                <h2>Todo lo necesario para proteger tus configuraciones</h2>
+                <p>
+                    Una herramienta práctica para mantener respaldada
+                    la información importante de tus servicios Render.
+                </p>
+            </div>
+
+            <div class="feature-grid">
+
+                <article class="feature-card">
+                    <div class="feature-icon">☁️</div>
+                    <h3>Múltiples cuentas Render</h3>
+                    <p>
+                        Agregá varias cuentas mediante sus API Keys
+                        y administrá sus respaldos desde una misma
+                        aplicación.
+                    </p>
+                </article>
+
+                <article class="feature-card">
+                    <div class="feature-icon">📋</div>
+                    <h3>Variables de entorno</h3>
+                    <p>
+                        Respalda las variables de entorno de los
+                        servicios y Environment Groups de tus cuentas.
+                    </p>
+                </article>
+
+                <article class="feature-card">
+                    <div class="feature-icon">📁</div>
+                    <h3>Secret Files</h3>
+                    <p>
+                        Incluye los archivos secretos de servicios
+                        y Environment Groups, conservando sus
+                        nombres y contenidos.
+                    </p>
+                </article>
+
+                <article class="feature-card">
+                    <div class="feature-icon">🔐</div>
+                    <h3>Cifrado avanzado</h3>
+                    <p>
+                        Cada respaldo se protege mediante
+                        AES-256-GCM y una clave derivada con scrypt.
+                    </p>
+                </article>
+
+                <article class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h3>Restauración de backups</h3>
+                    <p>
+                        Recuperá los datos de un respaldo cifrado
+                        y generá los archivos correspondientes
+                        en una carpeta de destino.
+                    </p>
+                </article>
+
+                <article class="feature-card">
+                    <div class="feature-icon">💻</div>
+                    <h3>Aplicación de escritorio</h3>
+                    <p>
+                        Interfaz sencilla para Windows, sin necesidad
+                        de utilizar comandos manualmente para las
+                        operaciones habituales.
+                    </p>
+                </article>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- COMO FUNCIONA -->
+
+    <section id="funcionamiento">
+
+        <div class="container">
+
+            <div class="section-header">
+                <span class="section-tag">Fácil de utilizar</span>
+                <h2>¿Cómo funciona?</h2>
+                <p>
+                    Realizá tus respaldos en pocos pasos,
+                    sin complicaciones.
+                </p>
+            </div>
+
+            <div class="steps-grid">
+
+                <article class="step">
+                    <div class="step-number">01</div>
+                    <h3>Conectá tu cuenta</h3>
+                    <p>
+                        Ingresá un nombre y la API Key de tu cuenta
+                        Render. Podés agregar varias cuentas.
+                    </p>
+                </article>
+
+                <article class="step">
+                    <div class="step-number">02</div>
+                    <h3>Creá el respaldo</h3>
+                    <p>
+                        Elegí una carpeta de destino y una contraseña
+                        para proteger el backup.
+                    </p>
+                </article>
+
+                <article class="step">
+                    <div class="step-number">03</div>
+                    <h3>Guardá tu backup</h3>
+                    <p>
+                        La aplicación genera archivos .hcbackup
+                        cifrados para conservarlos de forma segura.
+                    </p>
+                </article>
+
+                <article class="step">
+                    <div class="step-number">04</div>
+                    <h3>Restaurá cuando quieras</h3>
+                    <p>
+                        Seleccioná un backup, ingresá su contraseña
+                        y recuperá los archivos.
+                    </p>
+                </article>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- SEGURIDAD -->
+
+    <section class="security" id="seguridad">
+
+        <div class="container security-content">
+
+            <div>
+                <span class="section-tag">Privacidad y protección</span>
+
+                <h2>La seguridad de tus datos es una prioridad.</h2>
+
+                <p>
+                    Los respaldos contienen información sensible.
+                    Por eso, Server Backup Manager utiliza un sistema
+                    de cifrado para proteger su contenido.
+                </p>
+
+                <p>
+                    Las API Keys permanecen en memoria durante
+                    la sesión y no se guardan en archivos de
+                    configuración de la aplicación.
+                </p>
+            </div>
+
+            <div class="security-list">
+
+                <div class="security-item">
+                    <span class="check">✓</span>
+                    <div>
+                        <strong>AES-256-GCM</strong>
+                        <small>Cifrado autenticado de los respaldos.</small>
+                    </div>
+                </div>
+
+                <div class="security-item">
+                    <span class="check">✓</span>
+                    <div>
+                        <strong>Derivación de claves con scrypt</strong>
+                        <small>Protección mediante una contraseña elegida por el usuario.</small>
+                    </div>
+                </div>
+
+                <div class="security-item">
+                    <span class="check">✓</span>
+                    <div>
+                        <strong>Credenciales temporales</strong>
+                        <small>Las API Keys no se persisten en la aplicación.</small>
+                    </div>
+                </div>
+
+                <div class="security-item">
+                    <span class="check">✓</span>
+                    <div>
+                        <strong>Almacenamiento local</strong>
+                        <small>Los backups se guardan en la ubicación elegida por el usuario.</small>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- DESCARGA -->
+
+    <section class="download-section" id="descarga">
+
+        <div class="container">
+
+            <div class="download-card">
+
+                <div class="download-icon">📦</div>
+
+                <span class="section-tag">Disponible para Windows</span>
+
+                <h2>Descargá Server Backup Manager</h2>
+
+                <p>
+                    Comenzá a proteger las configuraciones
+                    de tus cuentas Render.
+                </p>
+
+                <div class="download-meta">
+                    <div class="meta-item">
+                        Versión: <strong>1.1.0</strong>
+                    </div>
+
+                    <div class="meta-item">
+                        Plataforma: <strong>Windows 10/11</strong>
+                    </div>
+
+                    <div class="meta-item">
+                        Formato: <strong>ZIP</strong>
+                    </div>
+                </div>
+
+                <!-- REEMPLAZAR POR EL ENLACE REAL DE GITHUB RELEASES -->
+
+                <a
+                    href="https://github.com/TU_USUARIO/TU_REPOSITORIO/releases/latest/download/Server-Backup-Manager-1.1.0-Windows.zip"
+                    class="btn btn-primary"
+                    id="downloadButton"
+                    target="_blank"
+                    rel="noopener noreferrer">
+
+                    ⬇ Descargar para Windows
+                </a>
+
+                <span class="download-note">
+                    Descarga gratuita. No requiere suscripción.
+                </span>
+
+                <div class="requirements">
+                    <h3>📌 Requisitos y primeros pasos</h3>
+
+                    <ul>
+                        <li>Windows 10 u 11.</li>
+                        <li>Python 3.10 o superior, instalado desde python.org y agregado al PATH.</li>
+                        <li>Conexión a Internet para consultar la API de Render.</li>
+                        <li>Ejecutar INSTALAR.bat una sola vez.</li>
+                        <li>Luego ejecutar INICIAR.bat para abrir el programa.</li>
+                    </ul>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- HISTORIAL -->
+
+    <section class="changelog" id="actualizaciones">
+
+        <div class="container">
+
+            <div class="section-header">
+                <span class="section-tag">Evolución del software</span>
+                <h2>Registro de actualizaciones</h2>
+                <p>
+                    Seguimos trabajando para mejorar la herramienta.
+                    Acá vas a encontrar las novedades de cada versión.
+                </p>
+            </div>
+
+            <div class="timeline">
+
+                <!-- VERSION 1.1.0 -->
+
+                <article class="release">
+
+                    <span class="release-date">Noviembre 2026</span>
+
+                    <h3>
+                        Versión 1.1.0
+                        <span class="version-badge">Actual</span>
+                    </h3>
+
+                    <ul>
+                        <li>Incorporación de respaldo de Secret Files de servicios.</li>
+                        <li>Incorporación de respaldo de Secret Files de Environment Groups.</li>
+                        <li>Restauración de Secret Files en subcarpetas específicas.</li>
+                        <li>Separación visual de las opciones Crear respaldo y Restaurar respaldo.</li>
+                        <li>Mantenimiento del cifrado AES-256-GCM con derivación de claves mediante scrypt.</li>
+                        <li>Mejoras en la organización de la interfaz.</li>
+                    </ul>
+
+                </article>
+
+                <!-- VERSION 1.0.1 -->
+
+                <article class="release">
+
+                    <span class="release-date">Versión anterior</span>
+
+                    <h3>Versión 1.0.1</h3>
+
+                    <ul>
+                        <li>Corrección del límite de memoria de scrypt en Windows.</li>
+                        <li>Mejoras en la identificación de resultados de los respaldos.</li>
+                        <li>Distinción entre respaldos completos, parciales y fallidos.</li>
+                        <li>Mejor información cuando no se genera ningún archivo de respaldo.</li>
+                    </ul>
+
+                </article>
+
+                <!-- VERSION 1.0.0 -->
+
+                <article class="release">
+
+                    <span class="release-date">Versión inicial</span>
+
+                    <h3>Versión 1.0.0</h3>
+
+                    <ul>
+                        <li>Primera versión funcional de la aplicación.</li>
+                        <li>Conexión con la API oficial de Render.</li>
+                        <li>Administración de múltiples cuentas.</li>
+                        <li>Respaldo de variables de entorno de servicios.</li>
+                        <li>Respaldo de variables de Environment Groups.</li>
+                        <li>Creación de backups cifrados.</li>
+                        <li>Restauración de archivos .env.</li>
+                    </ul>
+
+                </article>
+
+                <div class="future">
+                    <h3>🚀 Próximamente</h3>
+                    <p>
+                        Nuevas funcionalidades, mejoras de usabilidad
+                        y ampliación de las capacidades de respaldo.
+                        El historial se actualizará con cada nueva versión.
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- LIMITACIONES -->
+
+    <section class="limitations">
+
+        <div class="container">
+
+            <div class="limitations-box">
+
+                <h3>⚠️ Alcance actual del respaldo</h3>
+
+                <p>
+                    Actualmente, Server Backup Manager permite respaldar
+                    variables de entorno y Secret Files de servicios y
+                    Environment Groups de Render. No incluye bases de
+                    datos, discos persistentes, DNS, dominios ni
+                    configuraciones de despliegue. La restauración
+                    genera archivos locales para facilitar la recuperación
+                    manual de la información; no modifica automáticamente
+                    la configuración de los servicios en Render.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+<!-- FOOTER -->
+
+<footer>
+    <div class="container footer-content">
+
+        <div>
+            <div class="footer-brand">
+                Server <span>Backup Manager</span>
+            </div>
+
+            <p>
+                Desarrollado por Lalita635
+            </p>
+        </div>
+
+        <div class="footer-links">
+
+            <!-- REEMPLAZAR POR LOS ENLACES REALES -->
+
+            <a href="https://github.com/TU_USUARIO/TU_REPOSITORIO"
+               target="_blank"
+               rel="noopener noreferrer">
+                GitHub
+            </a>
+
+            <a href="https://github.com/TU_USUARIO/TU_REPOSITORIO/issues"
+               target="_blank"
+               rel="noopener noreferrer">
+                Reportar un error
+            </a>
+
+            <a href="#actualizaciones">
+                Actualizaciones
+            </a>
+
+        </div>
+
+        <p>
+            © <span id="currentYear"></span>
+            Server Backup Manager. Todos los derechos reservados.
+        </p>
+
+    </div>
+</footer>
+
+<script>
+    // Menú responsive
+
+    const menuToggle = document.getElementById("menuToggle");
+    const navigation = document.getElementById("navigation");
+
+    menuToggle.addEventListener("click", () => {
+        navigation.classList.toggle("active");
+
+        menuToggle.textContent =
+            navigation.classList.contains("active") ? "✕" : "☰";
+    });
+
+    // Cerrar menú al seleccionar una sección
+
+    document.querySelectorAll("#navigation a").forEach(link => {
+        link.addEventListener("click", () => {
+            navigation.classList.remove("active");
+            menuToggle.textContent = "☰";
+        });
+    });
+
+    // Año automático
+
+    document.getElementById("currentYear").textContent =
+        new Date().getFullYear();
+</script>
+
+</body>
+</html>
